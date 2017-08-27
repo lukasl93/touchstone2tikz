@@ -1,0 +1,87 @@
+% some wonderfull koma class scratcl, scrreprt, scrbook
+\documentclass[DIV=12,
+               fleqn,
+               numbers=noenddot,
+               headsepline,
+               twoside,
+               captions=tableabove]{scrreprt}
+
+% unicode requires at least teTeX-3
+\usepackage[utf8]{inputenc}
+% use own glyphs for accented letters instead of composite ones (ä vs. "a) in the _output_ format
+\usepackage[T1]{fontenc}
+% use "latin modern" for the fonts; else, T1-fontenc will use bitmap fonts
+\usepackage{lmodern}
+% use german language packages for direct ä,ö,ü,ß support in the graphs
+\usepackage[ngerman]{babel}
+
+% Support \overset in the Tikzpictures
+\usepackage{amsmath}
+
+% graphics packages
+\usepackage{tikz}
+% add support for patterns for requirement
+\usetikzlibrary{patterns}
+\usepackage{pgfplots}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=newest,every axis legend/.append style={font=\small},
+	x tick label style={/pgf/number format/.cd, set thousands separator={~}}
+}
+
+% use externalisation package
+\usepgfplotslibrary{external}
+% activate externalization!
+% must be run with pdflatex -shell-escape dummy.tex
+\tikzexternalize[prefix=tikzpictures/] %,mode=list and make
+
+% Helpful command for tikz picture inclusion
+\newcommand{\instikz}[2]{
+	\begin{figure}[hbtp]
+		\centering
+		\input{tikz/#1.tikz}
+		\caption{#2}
+		\label{plot:#1}
+	\end{figure}	
+}
+
+
+\begin{document}
+
+	\chapter{Test}
+
+	This is a testdocument to check if the picture creation
+	by the python scripts actually worked out:
+
+	% Required definitions for the tikz pictures
+	% to define their width and height
+	\newlength\figureheight 
+	\newlength\figurewidth 
+	\setlength\figureheight{7cm} 
+	\setlength\figurewidth{\textwidth}
+	\addtolength{\figurewidth}{-2cm}
+
+	\section{Testpicture}
+	Created by the example in the End of TikzExport.py
+	\instikz{test}{Testpicture created from ClassTikzExport}
+	
+	\clearpage
+	\section{Complete Pictures}
+	Created by completetouchstone2tikz.py
+	\input{tikz/completepictures}
+
+	\clearpage
+	\section{Single Pictures}
+	Created by singletouchstone2tikz.py
+	\input{tikz/importallpictures}
+	
+	\clearpage
+	\section{Comparison Pictures}
+	Created by comptouchstone2tikz.py
+	\input{tikz/importcomppictures}
+
+	\clearpage
+	\section{Multiple Comparison Pictures}
+	Created by multcomptouchstone2tikz.py
+	\input{tikz/importmultcomppictures}
+	
+\end{document}
