@@ -12,7 +12,7 @@ An example Latex document is provided to compile the created Tikz-Files.
 ## File organisation
 
 The project is hierachically structured in the folder:
-
+<pre>
 *touchstone2tikz*
  |
  |- *Makefile*	Type make to create all Tikzpictures and create a PDF-file
@@ -51,9 +51,11 @@ The project is hierachically structured in the folder:
  	|- *dummy.pdf*	Latex output pdf, created by running make
  	|- *tikz*	Folder for Tikz files and files to include those into the document
  	|- *tikzpictures*	Folder for PDFs created by tikzexternalize
+</pre>
 
 ## Calling sequence
 
+<pre>
 Start -> Makefile 5- pdflatex
 			0|
 	makeprojecttikz.py
@@ -69,6 +71,7 @@ completetouchstone2tikz.py 	singletouchstone2tikz.py 	comptouchstone2tikz.py 	mu
 					-------------------------------------------------------------------------
 													|
 											TikzExport.py
+</pre>
 
 ## Usage
 
