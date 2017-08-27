@@ -56,21 +56,21 @@ The project is hierachically structured in the folder:
 ## Calling sequence
 
 <pre>
-Start -> Makefile 5- pdflatex
+Start --------------> Makefile -------------------5-------------------> pdflatex
 			0|
-	makeprojecttikz.py
+		makeprojecttikz.py
 			|
 	-----------------------------------------------------------------------------------------
-	1|								2|							3|							4|
+	1|				2|				3|			4|
 completetouchstone2tikz.py 	singletouchstone2tikz.py 	comptouchstone2tikz.py 	multcomptouchstone2tikz.py
-	|								|							|							|
-	---------------------------------							|							|
-					|											|							|
-				spara_db_2tikz.py 					comp_spara_db_2tikz.py 			comp_mult_spara_db_2tikz.py
-					|											|							|
-					-------------------------------------------------------------------------
-													|
-											TikzExport.py
+	|				|				|			|
+	---------------------------------				|			|
+			|						|			|
+		spara_db_2tikz.py 			comp_spara_db_2tikz.py 		comp_mult_spara_db_2tikz.py
+			|						|			|
+			-------------------------------------------------------------------------
+						|
+					TikzExport.py
 </pre>
 
 ## Usage
