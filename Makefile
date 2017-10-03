@@ -16,6 +16,7 @@ all:
 	#make graphs	
 	make $(TARGET).pdf
 	make $(TARGET).pdf
+	xdg-open $(CURRDIR)/$(LATEXFOLDER)/dummy.pdf &
 
 help:
 	@echo "Description:"
