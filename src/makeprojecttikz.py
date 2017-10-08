@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 # -*- coding: utf-8
-
+#
 ## @package makeprojecttikz
 #
 # Script to (re)create all tikz plots
@@ -20,10 +20,10 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'basefiles'))
 from tikzhelpers import clearImportFile
 sys.path.append(os.path.join(os.path.dirname(__file__), 'configscripts'))
-from singletouchstone2tikz import touchstone2tikz
-from completetouchstone2tikz import fulltouchstone2tikz
-from comptouchstone2tikz import comparisons2tikz
-from multcomptouchstone2tikz import multcomparisons2tikz
+from singletouchstone2tikz import threadtouchstone2tikz
+from completetouchstone2tikz import threadfulltouchstone2tikz
+from comptouchstone2tikz import threadcomparisons2tikz
+from multcomptouchstone2tikz import threadmultcomparisons2tikz
 
 
 # Source directory with .s*p files
@@ -59,24 +59,37 @@ clearImportFile(os.path.join(resultdir, 'importcomppictures.tex'))
 clearImportFile(os.path.join(resultdir, 'importmultcomppictures.tex'))
 
 # Create Tikz plots containing full S-Matrix
-fulltouchstone2tikz(os.path.join(sourcedir, 'fullpic'), resultdir)
+fulltikz = threadfulltouchstone2tikz(os.path.join(sourcedir, 'fullpic'),
+                                     resultdir)
+fulltikz.start()
+
 
 # Create Tikz plots based on one Touchstone file
-touchstone2tikz(os.path.join(sourcedir, 'singlepic'), resultdir)
-
-# Create Tikz plots based on one Touchstone file
-touchstone2tikz(os.path.join(sourcedir, 'singlepic'), resultdir)
+singletikz = threadtouchstone2tikz(os.path.join(sourcedir, 'singlepic'),
+                                   resultdir)
+singletikz.start()
 
 # Create Tikz plots containing comparisions of multiple
 # Touchstone files
 for d in singlesubdirs:
     # Call the main function provided by this package
-    comparisons2tikz(os.path.join(sourcedir, 'singlecomppic', d),
-                     resultdir, d)
+    comptikz = threadcomparisons2tikz(
+        os.path.join(sourcedir, 'singlecomppic', d),
+        resultdir, d)
+    comptikz.start()
 
 # Create Tikz plots containing comparisions of multiple
 # Touchstone files and multiple S-Paramesters
 for d in multsubdirs:
     # Call the main function provided by this package
-    multcomparisons2tikz(os.path.join(sourcedir, 'multcomppic', d),
-                         resultdir, d)
+    multcomptikz = threadmultcomparisons2tikz(
+        os.path.join(sourcedir, 'multcomppic', d),
+        resultdir, d)
+    multcomptikz.start()
+
+fulltikz.join()
+singletikz.join()
+comptikz.join()
+multcomptikz.join()
+
+print("All done")
