@@ -179,14 +179,29 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
             )
         # Transform data to required format
         data = []
-        for m in range(0, len(network.f), 1):
-            data.append(
-                ClassData2D(
-                    network.f[m] / get_frequnits()[frequnit],
-                    network.s_db[m][int(indexes[i][0]) - 1]
-                    [int(indexes[i][1]) - 1]
+        if type(indexes[i]) is tuple:
+            for m in range(0, len(network.f), 1):
+                data.append(
+                    ClassData2D(
+                        network.f[m] / get_frequnits()[frequnit],
+                        network.s_db[m][int(indexes[i][0]) - 1]
+                        [int(indexes[i][1]) - 1]
+                    )
                 )
-            )
+        elif indexes[i] == 'D':  # Calculate directivity
+            for m in range(0, len(network.f), 1):
+                directivity = (network.s_db[m][(3) - 1][(1) - 1] -
+                               (network.s_db[m][(2) - 1][(1) - 1] +
+                                network.s_db[m][(3) - 1][(2) - 1]))
+                data.append(
+                    ClassData2D(
+                        network.f[m] / get_frequnits()[frequnit],
+                        directivity
+                    )
+                )
+        else:
+            raise TypeError('indexes contains unknown Type and Option!')
+
         # Add data to plot
         tikzplot.adddata(data)
         # Add legend with description if given

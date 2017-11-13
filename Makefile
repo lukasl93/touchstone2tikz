@@ -6,7 +6,7 @@ SRCTEX = $(shell find $(LATEXFOLDER)/ -name "*.tex")
 SRCAUX = $(shell find $(LATEXFOLDER)/ -name "*.aux")
 SRCPDF = $(shell find $(LATEXFOLDER)/tikzpictures -name "*.pdf")
 SRCTIKZ = $(shell find $(LATEXFOLDER)/tikz -name "*.tikz")
-SRCTSTN = $(shell find $(CURRDIR)/touchstoneinput -name "*.s[1-9]p")
+SRCTSTN = $(shell find $(CURRDIR)/touchstoneinput -name "*.s[1-9]p")	# works only up 9 Ports
 # SRCPIC = $(shell find $(LATEXFOLDER)/pictures -name "*.jpg" -or -name "*.png")
 
 all:
@@ -40,14 +40,14 @@ tsn2tikz: $(SRCTSTN)
 # \tikzexternalize[prefix=tikzpictures/,mode=list and make]
 # on linux machines
 graphs: $(SRCTIKZ)
-	make -j 8 -f $(TARGET).makefile
+	cd $(CURRDIR)/$(LATEXFOLDER) && make -j 8 -f $(TARGET).makefile
 
 .PHONY: clean tikzclear warn
 clean: 
 	rm -f *.toc *.out *.aux *.log *.mtc* *.maf *~ *.backup *.lof *.blg *.auxlock *.fdb_latexmk *.synctex.gz *.bbl *.makefile *.fls *.figlist
 
 tikzclear:
-	cd $(CURRDIR)/$(LATEXFOLDER)/tikz && rm *ANP*.tikz *KOP*.tikz *ISO*.tikz
+	cd $(CURRDIR)/$(LATEXFOLDER)/tikz && rm *.tikz
 	cd $(CURRDIR)/$(LATEXFOLDER)/tikzpictures && rm *.log *.dpth *.md5 *.pdf *.dep
 
 warn:
