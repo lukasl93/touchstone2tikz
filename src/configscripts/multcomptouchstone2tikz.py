@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 # -*- coding: utf-8
-
+#
 ## @package multcomptouchstone2tikz
 #
 # Script to export Matching, Coupling and Isolation comparison plots
@@ -19,6 +19,7 @@
 
 import os
 import sys
+import threading
 from glob import glob
 from string import Template
 import skrf as rf
@@ -117,6 +118,18 @@ def multcomparisons2tikz(sourcedir, resultdir, compname=''):
     createImportFile(os.path.join(resultdir, 'importmultcomppictures.tex'),
                      teximport)
     print('Done!')
+
+
+## Class for multi threading support
+class threadmultcomparisons2tikz(threading.Thread):
+    def __init__(self, sourcedir, resultdir, compname):
+        threading.Thread.__init__(self)
+        self.sourcedir = sourcedir
+        self.resultdir = resultdir
+        self.compname = compname
+
+    def run(self):
+        multcomparisons2tikz(self.sourcedir, self.resultdir, self.compname)
 
 
 ## @cond Prevents doxygen from scanning the following

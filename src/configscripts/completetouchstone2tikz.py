@@ -18,6 +18,7 @@
 
 import os
 import sys
+import threading
 from glob import glob
 from string import Template
 import skrf as rf
@@ -55,6 +56,17 @@ def fulltouchstone2tikz(sourcedir, resultdir):
 
     createImportFile(os.path.join(resultdir, 'completepictures.tex'), teximport)
     print('Done!')
+
+
+## Class for multi threading support
+class threadfulltouchstone2tikz(threading.Thread):
+    def __init__(self, sourcedir, resultdir):
+        threading.Thread.__init__(self)
+        self.sourcedir = sourcedir
+        self.resultdir = resultdir
+
+    def run(self):
+        fulltouchstone2tikz(self.sourcedir, self.resultdir)
 
 
 ## @cond Prevents doxygen from scanning the following
