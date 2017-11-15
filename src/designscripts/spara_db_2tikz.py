@@ -51,7 +51,7 @@ from tikzhelpers import mean, get_frequnits
 # If not passed a sequence of predefined colors is used.
 # Example: ['0.00000,0.44700,0.74100','0.85000,0.32500,0.09800']
 def spara_db_2tikz(network, frequnit='GHz', indexes=[],
-                   descriptions=[''], requirements=[],
+                   descriptions=[''], requirements=[], unity='dB',
                    filename='test.tikz', linestyles=[], colors=[]):
     if not type(network) is Network:
         raise TypeError("Wrong data type for sparam! Must be skrf Network.")
@@ -90,8 +90,14 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
     tikzplot.addheader(filenames=network.name)
     for i in range(0, len(indexes), 1):
         # define a color for each graph to be added
-        colornames.append(
-            'colorS' + str(indexes[i][0]) + str(indexes[i][1]))
+        if type(indexes[i]) is tuple:
+            colornames.append(
+                'colorS' + str(indexes[i][0]) + str(indexes[i][1]))
+        elif indexes[i] == 'D':
+            colornames.append(
+                'colorS' + indexes[i])
+        else:
+            raise TypeError("Innapropriate Type for indexes element must be S-Param tuple or a known String!")
         # Use colors if given else use own defaults
         if len(colors) == len(indexes):
             tikzplot.addcolor(colornames[i], colors[i])
@@ -99,10 +105,24 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
             tikzplot.addcolor(
                 colornames[i],
                 tikzplot.get_collist()[i % len(tikzplot.get_collist())])
-
-        element = \
-            [s[int(indexes[i][0]) - 1][int(indexes[i][1]) - 1]
-                for s in network.s_db]
+        if type(indexes[i]) is tuple:
+            if unity == 'dB':
+                element = \
+                    [s[int(indexes[i][0]) - 1][int(indexes[i][1]) - 1]
+                        for s in network.s_db]
+            elif unity == 'deg':
+                element = \
+                    [s[int(indexes[i][0]) - 1][int(indexes[i][1]) - 1]
+                        for s in network.s_deg]
+            else:
+                raise ValueError('Innapropriate Unit for Y-Data in unity variable!')
+        elif indexes[i] == 'D':
+            element = [s[(3) - 1][(1) - 1] -
+                       (s[(2) - 1][(1) - 1] +
+                        s[(3) - 1][(2) - 1])
+                       for s in network.s_db]
+        else:
+            raise TypeError("Innapropriate Type for indexes element must be S-Param tuple or a known String!")
         # required for graph y boundaries
         max_values.append(max(element))
         min_values.append(min(element))
@@ -160,7 +180,7 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
         str(min(network.f) / get_frequnits()[frequnit]),
         str(max(network.f) / get_frequnits()[frequnit]),
         str(min_value - yaddr), str(max_value + yaddr),
-        xunit=frequnit, yunit='dB', addoptions=addopt,
+        xunit=frequnit, yunit=unity, addoptions=addopt,
         legendpos=tikzplot.get_legendpositions()[legendposind][0],
         legendanchor=tikzplot.get_legendpositions()[legendposind][1]
     )
@@ -180,14 +200,26 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
         # Transform data to required format
         data = []
         if type(indexes[i]) is tuple:
-            for m in range(0, len(network.f), 1):
-                data.append(
-                    ClassData2D(
-                        network.f[m] / get_frequnits()[frequnit],
-                        network.s_db[m][int(indexes[i][0]) - 1]
-                        [int(indexes[i][1]) - 1]
+            if unity == 'dB':
+                for m in range(0, len(network.f), 1):
+                    data.append(
+                        ClassData2D(
+                            network.f[m] / get_frequnits()[frequnit],
+                            network.s_db[m][int(indexes[i][0]) - 1]
+                            [int(indexes[i][1]) - 1]
+                        )
                     )
-                )
+            elif unity == 'deg':
+                for m in range(0, len(network.f), 1):
+                    data.append(
+                        ClassData2D(
+                            network.f[m] / get_frequnits()[frequnit],
+                            network.s_deg[m][int(indexes[i][0]) - 1]
+                            [int(indexes[i][1]) - 1]
+                        )
+                    )
+            else:
+                raise ValueError('Innapropriate Unit for Y-Data in unity variable!')
         elif indexes[i] == 'D':  # Calculate directivity
             for m in range(0, len(network.f), 1):
                 directivity = (network.s_db[m][(3) - 1][(1) - 1] -
@@ -206,8 +238,11 @@ def spara_db_2tikz(network, frequnit='GHz', indexes=[],
         tikzplot.adddata(data)
         # Add legend with description if given
         try:
-            tikzplot.addlegend(str(indexes[i][0]) + str(indexes[i][1]),
-                               descriptions[i])
+            if indexes[i] == 'D':
+                tikzplot.addlegend('D', ' - Direktivit"at')
+            else:
+                tikzplot.addlegend(str(indexes[i][0]) + str(indexes[i][1]),
+                                   descriptions[i])
         except IndexError:
             tikzplot.addlegend(str(indexes[i][0]) + str(indexes[i][1]))
 
